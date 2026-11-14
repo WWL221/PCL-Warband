@@ -50,6 +50,17 @@ Public Class Application
                     Catch ex As Exception
                         Environment.Exit(ProcessReturnValues.Fail)
                     End Try
+                ElseIf e.Args(0) = "--warband-launch" Then
+                    'PCL 战团版：无界面直接拉起一次战团（脚本/排障用，读 %APPDATA%\PCL Warband\warband.txt 里的设置）
+                    Try
+                        WarbandLoadSettings()
+                        Dim targetMod = WarbandFindModule(WarbandGamePath, WarbandModule)
+                        Dim launchError = WarbandLaunch(WarbandGamePath, targetMod, WarbandSelectedRuntime, WarbandNoIntro, WarbandExtraArgs)
+                        Environment.Exit(If(launchError = "", ProcessReturnValues.TaskDone, ProcessReturnValues.Fail))
+                    Catch ex As Exception
+                        Logger.Error(ex, "[Warband] --warband-launch 失败")
+                        Environment.Exit(ProcessReturnValues.Fail)
+                    End Try
                 ElseIf e.Args(0) = "--memory" Then
                     '内存优化
                     Dim Ram = My.Computer.Info.AvailablePhysicalMemory
