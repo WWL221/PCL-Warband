@@ -111,6 +111,12 @@ Public Class PageWarbandRight
 
     ' ---------------- 模块 ----------------
 
+    ''' <summary>取当前下拉框选中的模块（下拉项是 MyComboBoxItem，Tag 里放模块对象）。</summary>
+    Private Function SelectedWarbandModule() As WarbandModuleInfo
+        Dim item = TryCast(ComboModule.SelectedItem, MyComboBoxItem)
+        If item Is Nothing Then Return Nothing
+        Return TryCast(item.Tag, WarbandModuleInfo)
+    End Function
     Private Sub LoadWarbandModules()
         WarbandModules.Clear()
         Dim scanned = WarbandScanModules(WarbandGamePath)
@@ -118,7 +124,7 @@ Public Class PageWarbandRight
 
         ComboModule.Items.Clear()
         For Each item In WarbandModules
-            ComboModule.Items.Add(item)
+            ComboModule.Items.Add(New MyComboBoxItem With {.Content = item.DisplayName, .Tag = item})
         Next
 
         If WarbandModules.Count = 0 Then
@@ -127,6 +133,7 @@ Public Class PageWarbandRight
             Return
         End If
 
+        '优先用上次保存的模块；其次 Native；最后才取第一个。绝不再按体积/注册表猜。
         Dim index = WarbandModules.FindIndex(Function(m) m.Folder.Equals(WarbandModule, StringComparison.OrdinalIgnoreCase))
         If index < 0 Then index = WarbandModules.FindIndex(Function(m) m.Folder.Equals("Native", StringComparison.OrdinalIgnoreCase))
         If index < 0 Then index = 0
@@ -151,18 +158,20 @@ Public Class PageWarbandRight
 
     Private Sub ComboModule_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboModule.SelectionChanged
         If IsApplyingState Then Return
-        Dim selected = TryCast(ComboModule.SelectedItem, WarbandModuleInfo)
+        Dim selected = SelectedWarbandModule()
         If selected Is Nothing Then Return
         WarbandModule = selected.Folder
         WarbandSaveSettings()
         RefreshChecks()
         UpdateCommandPreview()
+        LabStatus.Text = "将启动：" & selected.Folder
+        If FrmWarbandLeft IsNot Nothing Then FrmWarbandLeft.RefreshWarbandLeft()
     End Sub
 
     ' ---------------- 启动选项 ----------------
 
     Private Sub RadioRuntime_Check(sender As Object, raiseByMouse As Boolean) _
-        Handles RadioX86.Check, RadioX64.Check, RadioDedicated.Check, RadioDedicatedX64.Check
+        Handles RadioX86.Check, RadioX64.Check
         If IsApplyingState Then Return
         Dim button = CType(sender, MyRadioButton)
         WarbandSelectedRuntime = CType(Val(button.Tag), WarbandRuntime)
@@ -174,12 +183,8 @@ Public Class PageWarbandRight
     Private Sub SelectRuntimeRadio(runtime As WarbandRuntime)
         Dim wasApplying = IsApplyingState
         IsApplyingState = True
-        Select Case runtime
-            Case WarbandRuntime.X86 : RadioX86.Checked = True
-            Case WarbandRuntime.X64 : RadioX64.Checked = True
-            Case WarbandRuntime.Dedicated : RadioDedicated.Checked = True
-            Case WarbandRuntime.DedicatedX64 : RadioDedicatedX64.Checked = True
-        End Select
+        '界面只暴露两档（与 WSE2 官方启动器一致）；专用服务器运行时会回落到 x64
+        If runtime = WarbandRuntime.X86 Then RadioX86.Checked = True Else RadioX64.Checked = True
         IsApplyingState = wasApplying
     End Sub
 
@@ -198,7 +203,7 @@ Public Class PageWarbandRight
     End Sub
 
     Private Sub UpdateCommandPreview()
-        Dim selected = TryCast(ComboModule.SelectedItem, WarbandModuleInfo)
+        Dim selected = SelectedWarbandModule()
         If selected Is Nothing OrElse String.IsNullOrWhiteSpace(WarbandGamePath) Then
             LabCommand.Text = "（选择游戏目录与模块后显示将要执行的命令行）"
             Return
@@ -210,7 +215,10 @@ Public Class PageWarbandRight
     ' ---------------- 启动 / 结束 ----------------
 
     Private Sub BtnLaunch_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnLaunch.Click
-        Dim selected = TryCast(ComboModule.SelectedItem, WarbandModuleInfo)
+        '以设置里持久化的模块名为准；下拉框只是它的显示层
+        Dim selected = WarbandFindModule(WarbandGamePath, WarbandModule)
+        If selected Is Nothing Then selected = SelectedWarbandModule()
+        If selected IsNot Nothing Then WarbandModule = selected.Folder
         Dim errorMessage = WarbandLaunch(WarbandGamePath, selected, WarbandSelectedRuntime, WarbandNoIntro, WarbandExtraArgs)
         LabStatus.Text = If(errorMessage = "", "已启动，等待游戏窗口出现…", errorMessage)
         If errorMessage = "" Then
@@ -242,7 +250,7 @@ Public Class PageWarbandRight
 
     Private Sub RefreshChecks()
         PanChecks.Children.Clear()
-        Dim selected = TryCast(ComboModule.SelectedItem, WarbandModuleInfo)
+        Dim selected = SelectedWarbandModule()
         For Each line In WarbandPreflight(WarbandGamePath, selected, WarbandSelectedRuntime)
             Dim text As New TextBlock With {
                 .Text = line,

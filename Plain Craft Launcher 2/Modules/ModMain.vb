@@ -371,6 +371,7 @@ EndHint:
     'PCL 战团版新增页面
     Public FrmWarbandLeft As PageWarbandLeft
     Public FrmWarbandRight As PageWarbandRight
+    Public FrmWarbandDownload As PageWarbandDownload
     Public FrmSelectLeft As PageSelectLeft
     Public FrmSelectRight As PageSelectRight
     Public FrmSpeedLeft As PageSpeedLeft

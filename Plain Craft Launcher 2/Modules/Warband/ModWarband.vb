@@ -90,6 +90,17 @@ Public Module ModWarband
     Public Const WarbandExeDedicatedX64 As String = "mb_warband_wse2_dedicated_x64.exe"
     Public Const WarbandSteamAppId As String = "48700"
 
+    ''' <summary>用 PCL 自带的「隐藏页面」设置把顶部栏收敛成「下载 + 战团」。</summary>
+    Public Sub WarbandApplyTrimmedNav()
+        Try
+            Settings.Set("UiHiddenPageLink", True)
+            Settings.Set("UiHiddenPageSetup", True)
+            Settings.Set("UiHiddenPageOther", True)
+            Settings.Set("UiHiddenPageDownload", False)
+        Catch ex As Exception
+            Logger.Warn(ex, "[Warband] 裁剪顶部导航失败")
+        End Try
+    End Sub
     ' ---------------- 版本相关的显示文字 ----------------
 
     Public Function RuntimeName(runtime As WarbandRuntime) As String
@@ -145,7 +156,7 @@ Public Module ModWarband
                 Select Case key
                     Case "GamePath" : WarbandGamePath = value
                     Case "Module" : WarbandModule = value
-                    Case "Runtime" : WarbandSelectedRuntime = CType(Math.Max(0, Math.Min(3, Val(value))), WarbandRuntime)
+                    Case "Runtime" : WarbandSelectedRuntime = If(Val(value) = 0, WarbandRuntime.X86, WarbandRuntime.X64)
                     Case "NoIntro" : WarbandNoIntro = (value = "1")
                     Case "ExtraArgs" : WarbandExtraArgs = value
                 End Select
@@ -241,6 +252,14 @@ Public Module ModWarband
 
     ' ---------------- 模块扫描 ----------------
 
+    ''' <summary>按文件夹名查找模块（找不到返回 Nothing）。启动时以它为准，避免界面状态串味。</summary>
+    Public Function WarbandFindModule(gamePath As String, folderName As String) As WarbandModuleInfo
+        If String.IsNullOrWhiteSpace(folderName) Then Return Nothing
+        For Each modInfo In WarbandScanModules(gamePath)
+            If modInfo.Folder.Equals(folderName, StringComparison.OrdinalIgnoreCase) Then Return modInfo
+        Next
+        Return Nothing
+    End Function
     Public Function WarbandScanModules(gamePath As String) As List(Of WarbandModuleInfo)
         Dim result As New List(Of WarbandModuleInfo)
         If String.IsNullOrWhiteSpace(gamePath) Then Return result
@@ -527,5 +546,88 @@ Public Module ModWarband
         End If
         Return "未命中已知崩溃特征。可以把 Logs 目录下的 rgl_log_*_crash.txt 反馈给项目 issue。"
     End Function
+
+End Module
+
+''' <summary>下载库里的一条 mod 记录（存在 %APPDATA%\PCL Warband\mods.json，可手动编辑）。</summary>
+Public Class WarbandModEntry
+    Public Property Name As String = ""
+    Public Property Note As String = ""
+    Public Property ChineseSearchUrl As String = ""
+    Public Property PanUrl As String = ""
+    Public Property PanCode As String = ""
+End Class
+
+Public Module ModWarbandLibrary
+
+    Public ReadOnly Property WarbandModLibraryFile As String = Path.Combine(WarbandDataDir, "mods.json")
+
+    ''' <summary>读取下载库；文件不存在时用本机 Modules 生成一份并落盘。</summary>
+    Public Function WarbandLoadModLibrary() As List(Of WarbandModEntry)
+        If File.Exists(WarbandModLibraryFile) Then
+            Try
+                Dim loaded = JsonConvert.DeserializeObject(Of List(Of WarbandModEntry))(File.ReadAllText(WarbandModLibraryFile))
+                If loaded IsNot Nothing AndAlso loaded.Count > 0 Then Return loaded
+            Catch ex As Exception
+                Logger.Warn(ex, "[Warband] 读取 mods.json 失败，将重新生成")
+            End Try
+        End If
+
+        Dim generated = WarbandBuildDefaultModLibrary()
+        WarbandSaveModLibrary(generated)
+        Return generated
+    End Function
+
+    Public Sub WarbandSaveModLibrary(entries As List(Of WarbandModEntry))
+        Try
+            Directory.CreateDirectory(WarbandDataDir)
+            File.WriteAllText(WarbandModLibraryFile, JsonConvert.SerializeObject(entries, Formatting.Indented), New UTF8Encoding(False))
+        Catch ex As Exception
+            Logger.Warn(ex, "[Warband] 保存 mods.json 失败")
+        End Try
+    End Sub
+
+    ''' <summary>用已安装模块生成条目：默认只带中文站搜索链接，网盘地址留给用户自己填。</summary>
+    Private Function WarbandBuildDefaultModLibrary() As List(Of WarbandModEntry)
+        Dim entries As New List(Of WarbandModEntry)
+
+        For Each modInfo In WarbandScanModules(WarbandGamePath)
+            entries.Add(New WarbandModEntry With {
+                .Name = modInfo.Folder,
+                .Note = If(modInfo.Compatible = "", "已安装 · " & modInfo.ResourceText, "已安装 · 兼容 " & modInfo.Compatible & " · " & modInfo.ResourceText),
+                .ChineseSearchUrl = WarbandChineseSearchUrl(modInfo.Folder)
+            })
+        Next
+
+        If entries.Count = 0 Then
+            Dim classics = {"Native", "Prophesy of Pendor", "In the Name of Jerusalem", "The Last Days of the Third Age",
+                            "Viking Conquest", "Napoleonic Wars", "Solid and Shade", "1257 AD"}
+            For Each modName In classics
+                entries.Add(New WarbandModEntry With {
+                    .Name = modName,
+                    .Note = "未安装",
+                    .ChineseSearchUrl = WarbandChineseSearchUrl(modName)
+                })
+            Next
+        End If
+
+        Return entries
+    End Function
+
+    ''' <summary>中文站（骑马与砍杀中文站 bbs.mountblade.com.cn）站内搜索链接。</summary>
+    Public Function WarbandChineseSearchUrl(modName As String) As String
+        Return "https://www.baidu.com/s?wd=" & Uri.EscapeDataString("site:bbs.mountblade.com.cn " & modName)
+    End Function
+
+    Public Const WarbandChineseSite As String = "https://bbs.mountblade.com.cn/"
+
+    Public Sub WarbandOpenUrl(url As String)
+        If String.IsNullOrWhiteSpace(url) Then Return
+        Try
+            Process.Start(New ProcessStartInfo(url) With {.UseShellExecute = True})
+        Catch ex As Exception
+            Logger.Warn(ex, "[Warband] 打开链接失败：" & url)
+        End Try
+    End Sub
 
 End Module

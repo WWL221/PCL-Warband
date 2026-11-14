@@ -39,10 +39,11 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
                         <TextBlock Text="运行时" VerticalAlignment="Center" Width="70" />
-                        <local:MyRadioButton x:Name="RadioX86" Text="x86 客户端" Tag="0" ColorType="Highlight" Margin="0,0,12,0" />
-                        <local:MyRadioButton x:Name="RadioX64" Text="x64 客户端" Tag="1" ColorType="Highlight" Margin="0,0,12,0" />
-                        <local:MyRadioButton x:Name="RadioDedicated" Text="专用服务器 x86" Tag="2" ColorType="Highlight" Margin="0,0,12,0" />
-                        <local:MyRadioButton x:Name="RadioDedicatedX64" Text="专用服务器 x64" Tag="3" ColorType="Highlight" />
+                        <local:MyRadioButton x:Name="RadioX86" Text="32 位（x86）" Tag="0" ColorType="Highlight" Margin="0,0,14,0" />
+                        <local:MyRadioButton x:Name="RadioX64" Text="64 位（x64）" Tag="1" ColorType="Highlight" />
+                        <TextBlock x:Name="LabRuntimeHint" VerticalAlignment="Center" Margin="18,0,0,0" FontSize="12"
+                                   Foreground="{DynamicResource ColorBrush3}"
+                                   Text="与 WSE2 官方启动器一致的两档；大型 mod 请用 x64（32 位只有 2GB 地址空间）。" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,15,0,0">

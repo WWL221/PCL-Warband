@@ -30,6 +30,9 @@
             <TextBlock Text="PCL 战团版：保留 PCL 的界面与设置体系，只把「启动什么」换成战团 + WSE2。"
                        TextWrapping="Wrap" FontSize="12" Margin="0,20,0,0"
                        Foreground="{DynamicResource ColorBrush3}" />
+            <TextBlock Text="界面框架来自 PCL2（© 龙腾猫跃），本作是基于 PCL 的第三方修改版，继续适用 PCL 的分发许可。"
+                       TextWrapping="Wrap" FontSize="11" Margin="0,8,0,0" Opacity="0.75"
+                       Foreground="{DynamicResource ColorBrush3}" />
         </StackPanel>
     </Grid>
 </local:MyPageLeft>

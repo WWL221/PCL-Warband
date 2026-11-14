@@ -13,10 +13,13 @@ Public Class PageWarbandLeft
     End Sub
 
     Private Sub BtnLeftLaunch_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnLeftLaunch.Click
-        Dim modules = WarbandScanModules(WarbandGamePath)
-        Dim selected = modules.FirstOrDefault(Function(m) m.Folder.Equals(WarbandModule, StringComparison.OrdinalIgnoreCase))
+        Dim selected = WarbandFindModule(WarbandGamePath, WarbandModule)
+        If selected Is Nothing Then
+            Hint("请先在右侧下拉框选择要启动的模块（当前记录的是「" & If(WarbandModule, "空") & "」）。", HintType.Red)
+            Return
+        End If
         Dim errorMessage = WarbandLaunch(WarbandGamePath, selected, WarbandSelectedRuntime, WarbandNoIntro, WarbandExtraArgs)
-        If errorMessage <> "" Then Hint(errorMessage, HintType.Red)
+        If errorMessage <> "" Then Hint(errorMessage, HintType.Red) Else Hint("已启动：" & selected.Folder, HintType.Blue)
     End Sub
 
     Private Sub BtnLeftOpenGame_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnLeftOpenGame.Click

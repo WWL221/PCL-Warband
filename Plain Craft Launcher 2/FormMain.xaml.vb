@@ -350,6 +350,7 @@ Public Class FormMain
         PageRight = FrmWarbandRight
         FrmWarbandRight.PageState = MyPageRight.PageStates.ContentStay
         BtnTitleSelect5.Checked = True
+        WarbandApplyTrimmedNav()
         '模式提醒
         If BuildType = BuildTypes.Debug Then Hint("[开发者模式] PCL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Red)
         If ModeDebug Then Hint("[调试模式] PCL 正以调试模式运行，这可能会导致性能下降，若无必要请不要开启！")
@@ -459,10 +460,7 @@ Public Class FormMain
             End Try
             '上报
             Telemetry("启动")
-            '开源版本提示
-            If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 主题切换：这是需要赞助解锁的纪念性质的功能，别让赞助者太伤心啦……{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……", "开源版本说明")
-            End If
+                        '开源版本提示：PCL 战团版移除该弹窗（Minecraft 专属特性用不到；署名与许可说明见战团页/下载页）
         End Sub, "初始化", ThreadPriority.Lowest)
 
         Logger.Info($"第三阶段加载用时：{GetTimeMs() - ApplicationStartTick} ms")
@@ -1407,7 +1405,7 @@ Public Class FormMain
     ''' <summary>
     ''' 通过点击导航栏改变页面。
     ''' </summary>
-    Private Sub BtnTitleSelect_Click(sender As MyRadioButton, raiseByMouse As Boolean) Handles BtnTitleSelect0.Check, BtnTitleSelect1.Check, BtnTitleSelect2.Check, BtnTitleSelect3.Check, BtnTitleSelect4.Check, BtnTitleSelect5.Check
+    Private Sub BtnTitleSelect_Click(sender As MyRadioButton, raiseByMouse As Boolean) Handles BtnTitleSelect0.Check, BtnTitleSelect1.Check, BtnTitleSelect5.Check
         If IsChangingPage Then Return
         PageChangeActual(Val(sender.Tag))
     End Sub
@@ -1486,10 +1484,9 @@ Public Class FormMain
                     PageChangeAnim(FrmWarbandLeft, FrmWarbandRight)
                 Case PageType.Launch '启动
                     PageChangeAnim(FrmLaunchLeft, FrmLaunchRight)
-                Case PageType.Download '下载
-                    If FrmDownloadLeft Is Nothing Then FrmDownloadLeft = New PageDownloadLeft
-                    'PageGet 方法会在未设置 SubType 时指定默认值，并建立相关页面的实例
-                    PageChangeAnim(FrmDownloadLeft, FrmDownloadLeft.PageGet(SubType))
+                Case PageType.Download '下载（PCL 战团版：改为战团 mod 下载库）
+                    If FrmWarbandDownload Is Nothing Then FrmWarbandDownload = New PageWarbandDownload
+                    PageChangeAnim(New MyPageLeft, FrmWarbandDownload)
                 Case PageType.Link '联机
                     If FrmLinkMain Is Nothing Then FrmLinkMain = New PageLinkMain
                     PageChangeAnim(New MyPageLeft, FrmLinkMain)
