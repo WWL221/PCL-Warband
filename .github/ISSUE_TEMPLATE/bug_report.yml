@@ -1,0 +1,67 @@
+name: Bug 反馈
+description: 反馈 PCL 战团版（PCL Warband）的问题
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请尽量填全下面几项，尤其是日志，否则很难定位。
+  - type: input
+    id: version
+    attributes:
+      label: 启动器版本
+      description: 标题栏上的 v 号，或在「关于」页查看
+      placeholder: v2.99.0.1-warband
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: 运行时
+      options:
+        - x86 客户端 (mb_warband_wse2.exe)
+        - x64 客户端 (mb_warband_wse2_x64.exe)
+        - 专用服务器 x86
+        - 专用服务器 x64
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: 模块（Modules 下的文件夹名）与兼容版本
+      placeholder: Prophesy of Pendor V3.9.5 - TaChengBan 10.31（compatible_with_warband = 1.174）
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开启动器，进入「战团」页
+        2. 选择模块 xxx，运行时 x64
+        3. 点「启动游戏」
+        4. 看到 ...
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: rgl_log.txt 最后 100 行
+      description: 位于游戏根目录；崩溃时也可用 Logs\rgl_log_*_crash.txt
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: diagnosis
+    attributes:
+      label: 「崩溃速诊」输出
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他信息
+      description: 截图、系统版本、显卡驱动、是否装了什么注入类工具
+    validations:
+      required: false

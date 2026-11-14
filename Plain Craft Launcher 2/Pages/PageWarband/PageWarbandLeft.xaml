@@ -1,0 +1,35 @@
+<local:MyPageLeft x:Class="PageWarbandLeft"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PCL"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" x:Name="PanBack"
+             d:DesignHeight="600" Width="300">
+    <Grid Name="PanInput">
+        <StackPanel Margin="22,32,22,20">
+            <TextBlock Text="战团" FontSize="24" FontWeight="Bold" />
+            <TextBlock Text="Mount &amp; Blade Warband · WSE2" Margin="0,6,0,0" FontSize="12"
+                       Foreground="{DynamicResource ColorBrush3}" />
+
+            <Border Background="{DynamicResource ColorBrushSemiTransparent}" CornerRadius="6" Padding="13,11" Margin="0,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="当前模块" FontSize="12" Foreground="{DynamicResource ColorBrush3}" />
+                    <TextBlock x:Name="LabLeftModule" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    <TextBlock Text="运行目标" FontSize="12" Foreground="{DynamicResource ColorBrush3}" Margin="0,12,0,0" />
+                    <TextBlock x:Name="LabLeftRuntime" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    <TextBlock Text="游戏目录" FontSize="12" Foreground="{DynamicResource ColorBrush3}" Margin="0,12,0,0" />
+                    <TextBlock x:Name="LabLeftPath" TextWrapping="Wrap" FontSize="12" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+            <local:MyButton x:Name="BtnLeftLaunch" Text="启动游戏" ColorType="Highlight" Height="36" Margin="0,20,0,0" Padding="16,6" />
+            <local:MyButton x:Name="BtnLeftOpenGame" Text="打开游戏目录" Height="30" Margin="0,10,0,0" Padding="13,5" />
+            <local:MyButton x:Name="BtnLeftOpenConfig" Text="打开 WSE2 配置目录" Height="30" Margin="0,10,0,0" Padding="13,5" />
+
+            <TextBlock Text="PCL 战团版：保留 PCL 的界面与设置体系，只把「启动什么」换成战团 + WSE2。"
+                       TextWrapping="Wrap" FontSize="12" Margin="0,20,0,0"
+                       Foreground="{DynamicResource ColorBrush3}" />
+        </StackPanel>
+    </Grid>
+</local:MyPageLeft>
