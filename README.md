@@ -37,6 +37,14 @@ dotnet build "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -c Release
 
 产物：`Plain Craft Launcher 2\bin\Release\net48\Plain Craft Launcher 2.exe`（需要 .NET Framework 4.8，Windows 10 1809+ 自带）。
 
+想一步装好并建桌面快捷方式（会把程序复制到固定目录，避免被重新构建冲掉）：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-desktop-shortcut.ps1
+# 自定义安装目录：
+powershell -ExecutionPolicy Bypass -File .\scripts\install-desktop-shortcut.ps1 -TargetDir "D:\game\PCL-Warband"
+```
+
 > 上游原本是 VS2015+ 老式 vbproj，本仓库把它改成了 SDK 风格（原文件保留为 `Plain Craft Launcher 2.vbproj.legacy` 以便对照），并补齐了老式项目里手写的 `Import`、`Resource`、`None` 项，所以 `dotnet build` 能直接编出 WPF 程序。
 
 ## 使用
