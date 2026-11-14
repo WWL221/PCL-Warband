@@ -333,17 +333,20 @@ Public Module ModWarband
     ' ---------------- 命令行与启动 ----------------
 
     Public Function WarbandBuildArguments(modInfo As WarbandModuleInfo, runtime As WarbandRuntime, noIntro As Boolean, extraArgs As String) As String
+        'WSE2 的命令行解析器不剥引号（--module "X" 会被当成带引号的目录名，找不到就回落到注册表里上次的模块），
+        '而且它会把 --module 之后所有“不以 - 开头”的 token 都吃进模块名，
+        '所以模块名必须是裸字符串、并且 --module 放在最后一项 —— 与 WSE2 官方启动器一致。
         Dim args As New List(Of String)
         If IsDedicated(runtime) Then
             args.Add("--config-path")
             args.Add("server_config.ini")
             args.Add("-r")
-            args.Add($"""{modInfo.Folder}.txt""")
+            args.Add(modInfo.Folder & ".txt")
         End If
-        args.Add("--module")
-        args.Add($"""{modInfo.Folder}""")
         If noIntro AndAlso Not IsDedicated(runtime) Then args.Add("--no-intro")
         If Not String.IsNullOrWhiteSpace(extraArgs) Then args.Add(extraArgs.Trim())
+        args.Add("--module")
+        args.Add(modInfo.Folder)
         Return String.Join(" ", args)
     End Function
 
@@ -356,9 +359,11 @@ Public Module ModWarband
         If exe = "" Then Return $"游戏目录里没有 {RuntimeExe(runtime)}，请确认 WSE2 已安装。"
 
         Try
-            Dim psi As New ProcessStartInfo(exe, WarbandBuildArguments(modInfo, runtime, noIntro, extraArgs)) With {
+            '用整串 Arguments（而不是 ArgumentList）：后者会自动加引号，正好踩中 WSE2 不认引号的坑
+            Dim psi As New ProcessStartInfo(exe) With {
                 .WorkingDirectory = gamePath,
-                .UseShellExecute = False
+                .UseShellExecute = False,
+                .Arguments = WarbandBuildArguments(modInfo, runtime, noIntro, extraArgs)
             }
             Process.Start(psi)
             WarbandRunning = True

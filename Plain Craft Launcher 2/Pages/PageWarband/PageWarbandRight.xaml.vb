@@ -141,7 +141,10 @@ Public Class PageWarbandRight
         IsApplyingState = True
         ComboModule.SelectedIndex = index
         IsApplyingState = False
-        WarbandModule = WarbandModules(index).Folder
+        '只有用户主动改下拉框时才写回设置；这里绝不覆盖已保存的模块名，避免“总是启动同一个 mod”
+        If Not WarbandModules(index).Folder.Equals(WarbandModule, StringComparison.OrdinalIgnoreCase) Then
+            LabStatus.Text = $"上次选的模块「{If(WarbandModule, "空")}」没找到，本次临时用 {WarbandModules(index).Folder}（选择后会记住）"
+        End If
 
         Dim x86 = WarbandExePath(WarbandGamePath, WarbandRuntime.X86) <> ""
         Dim x64 = WarbandExePath(WarbandGamePath, WarbandRuntime.X64) <> ""
