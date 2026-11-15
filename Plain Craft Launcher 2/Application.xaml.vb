@@ -50,6 +50,18 @@ Public Class Application
                     Catch ex As Exception
                         Environment.Exit(ProcessReturnValues.Fail)
                     End Try
+                ElseIf e.Args(0) = "--warband-install-wse2" Then
+                    'PCL 战团版：无界面安装内置 WSE2 —— --warband-install-wse2 <游戏目录>
+                    Try
+                        WarbandLoadSettings()
+                        Dim installDir = If(e.Args.Length > 1, e.Args(1), WarbandGamePath)
+                        Dim installReport = WarbandInstallBundledWse2(installDir)
+                        Logger.Info("[Warband] " & installReport)
+                        Environment.Exit(If(WarbandWse2Missing(installDir).Count = 0, ProcessReturnValues.TaskDone, ProcessReturnValues.Fail))
+                    Catch ex As Exception
+                        Logger.Error(ex, "[Warband] --warband-install-wse2 失败")
+                        Environment.Exit(ProcessReturnValues.Fail)
+                    End Try
                 ElseIf e.Args(0) = "--warband-download" Then
                     'PCL 战团版：无界面下载 —— --warband-download <url> [保存目录]
                     Try

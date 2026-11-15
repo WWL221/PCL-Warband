@@ -429,5 +429,56 @@ Public Class PageWarbandRight
             Logger.Warn(ex, "[Warband] 打开配置目录失败")
         End Try
     End Sub
+    ' ---------------- 内置 WSE2 ----------------
 
+    Private Sub RefreshWse2Status()
+        If LabWse2Status Is Nothing Then Return
+        LabWse2Status.Text = WarbandWse2StatusText(WarbandGamePath)
+        BtnInstallWse2.IsEnabled = WarbandHasBundledWse2()
+        If Not WarbandHasBundledWse2() Then
+            LabWse2Status.Text &= "（本包未内置 WSE2，请用「从 zip 安装…」）"
+        End If
+    End Sub
+
+    Private Sub BtnInstallWse2_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnInstallWse2.Click
+        If String.IsNullOrWhiteSpace(WarbandGamePath) OrElse Not Directory.Exists(WarbandGamePath) Then
+            LabStatus.Text = "先设置游戏目录，才能安装 WSE2。"
+            Return
+        End If
+
+        BtnInstallWse2.IsEnabled = False
+        LabStatus.Text = "正在安装 WSE2…"
+        UpdateLayout()
+        Try
+            Dim report = WarbandInstallBundledWse2(WarbandGamePath)
+            LabStatus.Text = report.Replace(vbCrLf, " ").Trim()
+            Hint("WSE2 安装完成", HintType.Blue)
+        Finally
+            BtnInstallWse2.IsEnabled = True
+            RefreshWse2Status()
+            RefreshChecks()
+            UpdateCommandPreview()
+        End Try
+    End Sub
+
+    Private Sub BtnInstallWse2Zip_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnInstallWse2Zip.Click
+        Dim dialog As New Microsoft.Win32.OpenFileDialog With {
+            .Title = "选择 WSE2 安装包（zip）",
+            .Filter = "WSE2 压缩包|*.zip|所有文件|*.*"
+        }
+        If dialog.ShowDialog() <> True Then Return
+        If String.IsNullOrWhiteSpace(WarbandGamePath) OrElse Not Directory.Exists(WarbandGamePath) Then
+            LabStatus.Text = "先设置游戏目录，才能安装 WSE2。"
+            Return
+        End If
+        LabStatus.Text = WarbandInstallWse2FromZip(dialog.FileName, WarbandGamePath).Replace(vbCrLf, " ").Trim()
+        RefreshWse2Status()
+        RefreshChecks()
+        UpdateCommandPreview()
+    End Sub
+
+    Private Sub BtnWse2Official_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnWse2Official.Click
+        'WSE2 的官方发布页（Taleworlds 论坛原帖），用来查版本与更新日志
+        WarbandOpenUrl("https://forums.taleworlds.com/index.php?threads/warband-script-enhancer-2.384882/")
+    End Sub
 End Class

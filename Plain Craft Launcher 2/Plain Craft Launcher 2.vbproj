@@ -228,4 +228,12 @@
     <None Include="..\PCLCS\bin\Microsoft.Win32.Registry.dll" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 内置 WSE2 载荷：4 个游戏 exe + 2 个 DLL，安装时释放到游戏根目录 -->
+    <EmbeddedResource Include="Resources\wse2-payload.zip">
+      <LogicalName>PCL.WarbandWse2Payload.zip</LogicalName>
+    </EmbeddedResource>
+    <None Remove="Resources\wse2-payload.zip" />
+  </ItemGroup>
+
 </Project>

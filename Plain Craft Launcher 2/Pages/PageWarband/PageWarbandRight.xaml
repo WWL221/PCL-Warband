@@ -26,6 +26,22 @@
                     </Grid>
                     <TextBlock x:Name="LabGameStatus" Margin="0,12,0,0" TextWrapping="Wrap"
                                Foreground="{DynamicResource ColorBrush3}" />
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="LabWse2Status" Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center"
+                                   FontSize="12" Foreground="{DynamicResource ColorBrush3}" />
+                        <local:MyButton x:Name="BtnInstallWse2" Grid.Column="1" Text="一键安装 WSE2" ColorType="Highlight"
+                                        Height="30" Padding="14,5" Margin="10,0,0,0" />
+                        <local:MyButton x:Name="BtnInstallWse2Zip" Grid.Column="2" Text="从 zip 安装…"
+                                        Height="30" Padding="14,5" Margin="8,0,0,0" />
+                        <local:MyButton x:Name="BtnWse2Official" Grid.Column="3" Text="WSE2 官方页"
+                                        Height="30" Padding="14,5" Margin="8,0,0,0" />
+                    </Grid>
                 </StackPanel>
             </local:MyCard>
 
