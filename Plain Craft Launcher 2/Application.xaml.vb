@@ -50,6 +50,24 @@ Public Class Application
                     Catch ex As Exception
                         Environment.Exit(ProcessReturnValues.Fail)
                     End Try
+                ElseIf e.Args(0) = "--warband-download" Then
+                    'PCL 战团版：无界面下载 —— --warband-download <url> [保存目录]
+                    Try
+                        WarbandLoadSettings()
+                        Dim dlUrl = e.Args(1)
+                        Dim dlDir = If(e.Args.Length > 2, e.Args(2), IO.Path.Combine(WarbandGamePath, "Modules"))
+                        DirectoryUtils.Create(dlDir)
+                        Dim dlName = WarbandGuessFileName(dlUrl)
+                        If dlName = "" Then dlName = "download-" & Date.Now.ToString("yyyyMMdd-HHmmss")
+                        Dim dlTask = WarbandStartDownload(dlUrl, dlName, IO.Path.Combine(dlDir, dlName), 8, False, "")
+                        Do While dlTask.IsActive
+                            Thread.Sleep(500)
+                        Loop
+                        Environment.Exit(If(dlTask.State = WarbandDownloadState.Completed, ProcessReturnValues.TaskDone, ProcessReturnValues.Fail))
+                    Catch ex As Exception
+                        Logger.Error(ex, "[Warband] --warband-download 失败")
+                        Environment.Exit(ProcessReturnValues.Fail)
+                    End Try
                 ElseIf e.Args(0) = "--warband-launch" Then
                     'PCL 战团版：无界面直接拉起一次战团（脚本/排障用，读 %APPDATA%\PCL Warband\warband.txt 里的设置）
                     Try

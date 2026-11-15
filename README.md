@@ -21,7 +21,10 @@
    - `mb_warband_wse2_dedicated[_x64].exe --config-path server_config.ini -r "<模块文件夹名>.txt" --module "<模块文件夹名>"`
 2. **自动定位游戏**：读 Steam 注册表 + `libraryfolders.vdf`，兜底扫盘符，找不到可手动选目录。
 3. **模块扫描**：遍历 `Modules\*`，解析 `module.ini` 的 `module_name` / `compatible_with_warband`，统计 `Resource` 体积并按体积排序提示。
-4. **WSE2 配置中心**：直接编辑 `Documents\Mount&Blade Warband WSE2\rgl_config.ini`，提供低配 / 均衡 / 高画质三套预设与 16 个关键项（按需纹理、纹理质量、MSAA、帧率上限、阴影贴图、尸体/布娃娃上限、任务线程数、FXAA、声音滤波……）。写入前**自动备份**，再用临时文件**原子替换**，避免写坏配置。
+4. **下载页（PCL 风格）**：粘贴 HTTP(S) 直链即可下载，**多线程分片 + 断点续传**（暂停、退出启动器后再继续都从断点接着下），保存目录默认是 Modules，可勾选"完成后解压到模块目录"；网盘分享页需先转成直链，页面里有说明与各网盘入口。
+   - 命令行也能用：Plain Craft Launcher 2.exe --warband-download <url> [保存目录]（无界面下载）
+   - 无界面启动：Plain Craft Launcher 2.exe --warband-launch
+5. **WSE2 配置中心**：直接编辑 `Documents\Mount&Blade Warband WSE2\rgl_config.ini`，提供低配 / 均衡 / 高画质三套预设与 16 个关键项（按需纹理、纹理质量、MSAA、帧率上限、阴影贴图、尸体/布娃娃上限、任务线程数、FXAA、声音滤波……）。写入前**自动备份**，再用临时文件**原子替换**，避免写坏配置。
 5. **启动前体检**：`steam_appid.txt` 是否为 48700、WSE2 依赖 DLL 是否齐全、32 位构建的 2GB 地址空间风险、模块里 ≥512MB 的畸形 `.brf` 告警。
 6. **崩溃速诊**：读 `rgl_log.txt` 尾部，按已知特征给出人话结论（`0xE0000006` 内存耗尽、面部网格缺失被升级成致命错误、Bullet 多线程碰撞访问违例、模块与本体版本不匹配……）。
 

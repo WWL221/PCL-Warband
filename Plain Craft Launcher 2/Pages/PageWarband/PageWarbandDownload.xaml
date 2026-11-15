@@ -9,49 +9,93 @@
     <local:MyScrollViewer x:Name="PanBack" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="25,10">
 
-            <local:MyCard Title="模组下载" Margin="0,15">
+            <local:MyCard Title="新建下载" Margin="0,15">
                 <StackPanel Margin="25,40,25,20">
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource ColorBrush3}"
-                               Text="这里集中放战团 mod 的下载入口：每个条目都能一键跳到「骑砍中文站」站内搜索，也可以自己填网盘链接与提取码（保存在本机 mods.json，不会上传）。" />
-                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-                        <local:MyTextBox x:Name="TextSearch" Width="240" Height="28" ToolTip="按名称过滤下面的列表" />
-                        <local:MyButton x:Name="BtnRefresh" Text="刷新列表" Height="28" Padding="13,5" Margin="10,0,0,0" />
-                        <local:MyButton x:Name="BtnOpenData" Text="打开数据文件" Height="28" Padding="13,5" Margin="8,0,0,0" />
-                        <local:MyButton x:Name="BtnChineseSite" Text="打开骑砍中文站" Height="28" Padding="13,5" Margin="8,0,0,0" />
-                    </StackPanel>
-                    <StackPanel x:Name="PanEntries" Margin="0,16,0,0" />
-                </StackPanel>
-            </local:MyCard>
+                               Text="粘贴下载链接即可（HTTP/HTTPS 直链、GitHub、ModDB、中文站附件、网盘直链都行）。支持多线程分片与断点续传：暂停、退出启动器后再继续，都从断点接着下。" />
 
-            <local:MyCard Title="填写 / 修改网盘地址" Margin="0,0,0,15">
-                <StackPanel Margin="25,40,25,20">
-                    <TextBlock x:Name="LabEditing" TextWrapping="Wrap" Foreground="{DynamicResource ColorBrush3}"
-                               Text="在下面的列表里点某个条目的「填写网盘」，这里就会切换到那一条。" />
                     <Grid Margin="0,14,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70" />
                             <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="网盘链接" VerticalAlignment="Center" Margin="0,0,0,10" />
-                        <local:MyTextBox x:Name="TextPanUrl" Grid.Row="0" Grid.Column="1" Height="28" Margin="0,0,0,10"
-                                         ToolTip="例如 https://pan.baidu.com/s/xxxx 或 https://www.123pan.com/s/xxxx" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="提取码" VerticalAlignment="Center" Margin="0,0,0,10" />
-                        <local:MyTextBox x:Name="TextPanCode" Grid.Row="1" Grid.Column="1" Height="28" Width="160" HorizontalAlignment="Left" Margin="0,0,0,10" />
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                            <local:MyButton x:Name="BtnSaveEntry" Text="保存到本机" ColorType="Highlight" Height="30" MinWidth="140" Padding="14,5" />
-                            <TextBlock x:Name="LabSaveStatus" VerticalAlignment="Center" Margin="14,0,0,0" Foreground="{DynamicResource ColorBrush3}" />
+                        <TextBlock Grid.Column="0" Text="链接" VerticalAlignment="Center" />
+                        <local:MyTextBox x:Name="TextUrl" Grid.Column="1" Height="30"
+                                         ToolTip="例如 https://github.com/xxx/yyy/releases/download/v1/mod.zip" />
+                        <local:MyButton x:Name="BtnPaste" Grid.Column="2" Text="粘贴" Height="30" Padding="14,5" Margin="10,0,0,0" />
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="保存到" VerticalAlignment="Center" />
+                        <local:MyTextBox x:Name="TextSaveDir" Grid.Column="1" Height="30" />
+                        <local:MyButton x:Name="BtnBrowseDir" Grid.Column="2" Text="浏览…" Height="30" Padding="14,5" Margin="10,0,0,0" />
+                        <local:MyButton x:Name="BtnDefaultDir" Grid.Column="3" Text="模块目录" Height="30" Padding="14,5" Margin="8,0,0,0" />
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="文件名" VerticalAlignment="Center" />
+                        <local:MyTextBox x:Name="TextFileName" Grid.Column="1" Height="30" ToolTip="留空则用链接里的文件名" />
+                        <local:MyCheckBox x:Name="CheckUnzip" Grid.Column="2" Text="完成后解压到模块目录" Margin="14,0,0,0" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="线程" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <local:MyComboBox x:Name="ComboThreads" Width="90" Height="30">
+                                <local:MyComboBoxItem Content="1" Tag="1" />
+                                <local:MyComboBoxItem Content="4" Tag="4" />
+                                <local:MyComboBoxItem Content="8" Tag="8" IsSelected="True" />
+                                <local:MyComboBoxItem Content="16" Tag="16" />
+                            </local:MyComboBox>
                         </StackPanel>
+                        <local:MyButton x:Name="BtnStart" Grid.Column="1" Text="开始下载" ColorType="Highlight"
+                                        Height="34" MinWidth="150" Padding="18,6" Margin="18,0,0,0" />
+                        <TextBlock x:Name="LabStartHint" Grid.Column="2" VerticalAlignment="Center" Margin="16,0,0,0"
+                                   TextWrapping="Wrap" Foreground="{DynamicResource ColorBrush3}" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>
 
+            <local:MyCard Title="下载任务" Margin="0,0,0,15">
+                <StackPanel Margin="25,40,25,20">
+                    <StackPanel x:Name="PanTasks" />
+                    <TextBlock x:Name="LabNoTask" TextWrapping="Wrap" Foreground="{DynamicResource ColorBrush3}"
+                               Text="还没有任务。粘贴链接、点「开始下载」就会出现在这里。" />
+                </StackPanel>
+            </local:MyCard>
+
+            <local:MyCard Title="关于网盘" Margin="0,0,0,15">
+                <StackPanel Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource ColorBrush3}"
+                               Text="网盘「分享页」（pan.baidu.com/s/…、123pan.com/s/…、pan.quark.cn/s/… 这类）本身不是文件地址，必须先转成直链才能交给下载器。两种做法：① 用网盘客户端「下载」后在这里选「浏览…」指定已有文件，或直接用手动方式放进 Modules；② 在浏览器里用直链解析工具转出真实地址，再粘贴到上面的「链接」框——转出来的直链本页就能多线程断点续传。" />
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <local:MyButton x:Name="BtnOpenBaidu" Text="打开百度网盘" Height="30" Padding="14,5" />
+                        <local:MyButton x:Name="BtnOpen123" Text="打开 123 网盘" Height="30" Padding="14,5" Margin="8,0,0,0" />
+                        <local:MyButton x:Name="BtnOpenQuark" Text="打开夸克网盘" Height="30" Padding="14,5" Margin="8,0,0,0" />
+                        <local:MyButton x:Name="BtnOpenChineseSite" Text="打开骑砍中文站" Height="30" Padding="14,5" Margin="8,0,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </local:MyCard>
+
             <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource ColorBrush3}" Margin="4,0,4,20"
-                       Text="说明：本页只提供链接跳转，不托管也不转存任何文件；网盘链接默认留空，请自行填写并注意来源与版权。界面与设置体系来自 PCL2（© 龙腾猫跃），本作是基于 PCL 的第三方修改版。" />
+                       Text="本页只做下载，不托管、不转存任何文件；请自行确认资源来源与授权。界面与设置体系来自 PCL2（© 龙腾猫跃），本作是基于 PCL 的第三方修改版。" />
         </StackPanel>
     </local:MyScrollViewer>
 </local:MyPageRight>
