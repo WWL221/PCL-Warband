@@ -11,6 +11,19 @@ Imports System.Text
 Imports System.Text.RegularExpressions
 Imports Microsoft.Win32
 
+''' <summary>
+''' 下拉框条目：MyComboBox 会用 SelectedItem.ToString() 和输入框文本比对，
+''' MyComboBoxItem 的默认 ToString() 是类型名，会导致它把选中项清空（表现就是“模块自己变回第一个”）。
+''' 这里重写 ToString() 让它返回显示文本。
+''' </summary>
+Public Class WarbandModuleComboItem
+    Inherits MyComboBoxItem
+
+    Public Overrides Function ToString() As String
+        If Content Is Nothing Then Return ""
+        Return Content.ToString()
+    End Function
+End Class
 ''' <summary>Modules 目录下的一个模块。</summary>
 Public Class WarbandModuleInfo
     Public Property Folder As String = ""
