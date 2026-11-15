@@ -13,7 +13,7 @@
                        Foreground="{DynamicResource ColorBrush3}" />
 
             <!-- 模块预览图（仿 WSE2 官方启动器） -->
-            <Border CornerRadius="7" Height="190" Margin="0,16,0,0" ClipToBounds="True"
+            <Border CornerRadius="7" Height="150" Margin="0,14,0,0" ClipToBounds="True"
                     Background="{DynamicResource ColorBrushSemiTransparent}">
                 <Grid>
                     <local:MyImage x:Name="ImgModuleArt" Stretch="UniformToFill" />

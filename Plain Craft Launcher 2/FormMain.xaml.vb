@@ -1741,4 +1741,30 @@ Public Class FormMain
         lastMouseArg = e
     End Sub
 
+
+    ' ---------------- PCL 战团版：窗口尺寸夹紧 ----------------
+    ' PCL 会记住上次窗口大小；一旦在别的分辨率下被拉到超过当前屏幕，就会出现“底部按钮怎么拖都看不到”。
+    Private Sub WarbandClampWindowToScreen() Handles Me.Loaded
+        Dispatcher.BeginInvoke(
+            Sub()
+                Try
+                    If WindowState <> WindowState.Normal Then Return
+                    Dim work = SystemParameters.WorkArea
+                    Dim maxW = Math.Max(MinWidth, work.Width - 40)
+                    Dim maxH = Math.Max(MinHeight, work.Height - 60)
+                    Dim changed = False
+                    If Width > maxW Then
+                        Width = maxW
+                        changed = True
+                    End If
+                    If Height > maxH Then
+                        Height = maxH
+                        changed = True
+                    End If
+                    If changed Then Logger.Info($"[Warband] 窗口尺寸超出屏幕，已夹紧到 {CInt(Width)}x{CInt(Height)}")
+                Catch ex As Exception
+                    Logger.Warn(ex, "[Warband] 夹紧窗口尺寸失败")
+                End Try
+            End Sub, System.Windows.Threading.DispatcherPriority.Background)
+    End Sub
 End Class
