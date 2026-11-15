@@ -62,6 +62,7 @@ Public Class PageWarbandRight
 
         LoadWarbandModules()
         LoadKnobs()
+        RefreshWse2Status()
         RefreshChecks()
         RefreshLogTail()
         UpdateCommandPreview()
@@ -104,6 +105,7 @@ Public Class PageWarbandRight
         WarbandGamePath = path
         WarbandSaveSettings()
         LoadWarbandModules()
+        RefreshWse2Status()
         RefreshChecks()
         RefreshLogTail()
         UpdateCommandPreview()
@@ -157,6 +159,7 @@ Public Class PageWarbandRight
         LoadWarbandModules()
         RefreshChecks()
         UpdateCommandPreview()
+        RefreshWse2Status()
     End Sub
 
     Private Sub ComboModule_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboModule.SelectionChanged
