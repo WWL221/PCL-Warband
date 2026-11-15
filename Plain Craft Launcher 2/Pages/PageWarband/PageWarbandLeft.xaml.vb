@@ -10,7 +10,50 @@ Public Class PageWarbandLeft
         LabLeftModule.Text = If(String.IsNullOrWhiteSpace(WarbandModule), "（未选择）", WarbandModule)
         LabLeftRuntime.Text = RuntimeName(WarbandSelectedRuntime)
         LabLeftPath.Text = If(String.IsNullOrWhiteSpace(WarbandGamePath), "未设置", WarbandGamePath)
+        RefreshModuleArt()
     End Sub
+
+    ' ---------------- 模块预览图 ----------------
+
+    Private Sub RefreshModuleArt()
+        Try
+            Dim artPath = WarbandFindModuleArt(WarbandModule, WarbandGamePath)
+            If artPath <> "" Then
+                ImgModuleArt.ActualSource = artPath
+                ImgModuleArt.Visibility = Visibility.Visible
+                PanArtEmpty.Visibility = Visibility.Collapsed
+            Else
+                ImgModuleArt.Visibility = Visibility.Collapsed
+                PanArtEmpty.Visibility = Visibility.Visible
+            End If
+        Catch ex As Exception
+            Logger.Warn(ex, "[Warband] 加载模块预览图失败")
+            ImgModuleArt.Visibility = Visibility.Collapsed
+            PanArtEmpty.Visibility = Visibility.Visible
+        End Try
+    End Sub
+
+    Private Sub BtnChangeArt_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnChangeArt.Click
+        If String.IsNullOrWhiteSpace(WarbandModule) Then
+            Hint("先选一个模块，再换图。", HintType.Red)
+            Return
+        End If
+        Dim dialog As New Microsoft.Win32.OpenFileDialog With {
+            .Title = "选择模块预览图（png / jpg / webp / bmp）",
+            .Filter = "图片|*.png;*.jpg;*.jpeg;*.webp;*.bmp|所有文件|*.*"
+        }
+        If dialog.ShowDialog() <> True Then Return
+        Hint(WarbandSetModuleArt(WarbandModule, dialog.FileName), HintType.Blue)
+        RefreshModuleArt()
+    End Sub
+
+    Private Sub BtnClearArt_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnClearArt.Click
+        WarbandClearModuleArt(WarbandModule)
+        Hint("已清除自定义图，回落到模块自带的 main.bmp", HintType.Blue)
+        RefreshModuleArt()
+    End Sub
+
+    ' ---------------- 快捷按钮 ----------------
 
     Private Sub BtnLeftLaunch_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnLeftLaunch.Click
         Dim selected = WarbandFindModule(WarbandGamePath, WarbandModule)

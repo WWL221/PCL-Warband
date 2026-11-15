@@ -64,7 +64,6 @@ Public Class PageWarbandRight
         LoadWarbandModules()
         LoadKnobs()
         RefreshWse2Status()
-        RefreshBanner()
         RefreshChecks()
         RefreshLogTail()
         UpdateCommandPreview()
@@ -175,7 +174,6 @@ Public Class PageWarbandRight
         RefreshChecks()
         UpdateCommandPreview()
         LabStatus.Text = "将启动：" & selected.Folder
-        RefreshBanner()
         If FrmWarbandLeft IsNot Nothing Then FrmWarbandLeft.RefreshWarbandLeft()
     End Sub
 
@@ -490,59 +488,4 @@ Public Class PageWarbandRight
         WarbandOpenUrl("https://forums.taleworlds.com/index.php?threads/warband-script-enhancer-2.384882/")
     End Sub
 
-    ' ---------------- 模块大图横幅 ----------------
-
-    Private Sub RefreshBanner()
-        If LabBannerTitle Is Nothing Then Return
-        Dim modInfo = SelectedWarbandModule()
-        If modInfo Is Nothing Then modInfo = WarbandFindModule(WarbandGamePath, WarbandModule)
-
-        LabBannerTitle.Text = If(modInfo Is Nothing, If(String.IsNullOrWhiteSpace(WarbandModule), "未选择模块", WarbandModule), modInfo.Folder)
-        If modInfo Is Nothing Then
-            LabBannerSub.Text = ""
-        Else
-            Dim parts As New List(Of String)
-            If modInfo.InternalName <> "" Then parts.Add(modInfo.InternalName)
-            If modInfo.Compatible <> "" Then parts.Add("兼容 " & modInfo.Compatible)
-            parts.Add("Resource " & modInfo.ResourceText)
-            parts.Add(RuntimeName(WarbandSelectedRuntime))
-            LabBannerSub.Text = String.Join("  ·  ", parts)
-        End If
-
-        Try
-            Dim artPath = WarbandFindModuleArt(If(modInfo Is Nothing, WarbandModule, modInfo.Folder), WarbandGamePath)
-            If artPath <> "" Then
-                ImgBanner.ActualSource = artPath
-                ImgBanner.Visibility = Visibility.Visible
-                PanBannerEmpty.Visibility = Visibility.Collapsed
-            Else
-                ImgBanner.Visibility = Visibility.Collapsed
-                PanBannerEmpty.Visibility = Visibility.Visible
-            End If
-        Catch ex As Exception
-            Logger.Warn(ex, "[Warband] 加载模块大图失败")
-            ImgBanner.Visibility = Visibility.Collapsed
-            PanBannerEmpty.Visibility = Visibility.Visible
-        End Try
-    End Sub
-
-    Private Sub BtnBannerChange_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnBannerChange.Click
-        If String.IsNullOrWhiteSpace(WarbandModule) Then
-            LabStatus.Text = "先选一个模块，再换图。"
-            Return
-        End If
-        Dim dialog As New Microsoft.Win32.OpenFileDialog With {
-            .Title = "选择模块预览图（png / jpg / webp / bmp）",
-            .Filter = "图片|*.png;*.jpg;*.jpeg;*.webp;*.bmp|所有文件|*.*"
-        }
-        If dialog.ShowDialog() <> True Then Return
-        LabStatus.Text = WarbandSetModuleArt(WarbandModule, dialog.FileName)
-        RefreshBanner()
-    End Sub
-
-    Private Sub BtnBannerClear_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnBannerClear.Click
-        WarbandClearModuleArt(WarbandModule)
-        LabStatus.Text = "已清除自定义图，回落到模块自带的 main.bmp"
-        RefreshBanner()
-    End Sub
 End Class

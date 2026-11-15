@@ -12,7 +12,31 @@
             <TextBlock Text="Mount &amp; Blade Warband · WSE2" Margin="0,6,0,0" FontSize="12"
                        Foreground="{DynamicResource ColorBrush3}" />
 
-            <Border Background="{DynamicResource ColorBrushSemiTransparent}" CornerRadius="6" Padding="13,11" Margin="0,20,0,0">
+            <!-- 模块预览图（仿 WSE2 官方启动器） -->
+            <Border CornerRadius="7" Height="190" Margin="0,16,0,0" ClipToBounds="True"
+                    Background="{DynamicResource ColorBrushSemiTransparent}">
+                <Grid>
+                    <local:MyImage x:Name="ImgModuleArt" Stretch="UniformToFill" />
+                    <Border x:Name="PanArtEmpty" Background="{DynamicResource ColorBrushSemiTransparent}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="暂无预览图" FontSize="12" HorizontalAlignment="Center"
+                                       Foreground="{DynamicResource ColorBrush3}" />
+                            <TextBlock Text="点下方「更换图片」" FontSize="11" Margin="0,4,0,0" HorizontalAlignment="Center"
+                                       Foreground="{DynamicResource ColorBrush3}" Opacity="0.8" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <local:MyButton x:Name="BtnChangeArt" Grid.Column="0" Text="更换图片" Height="28" Padding="10,4" />
+                <local:MyButton x:Name="BtnClearArt" Grid.Column="1" Text="清除" Height="28" Padding="10,4" Margin="8,0,0,0" />
+            </Grid>
+
+            <Border Background="{DynamicResource ColorBrushSemiTransparent}" CornerRadius="6" Padding="13,11" Margin="0,16,0,0">
                 <StackPanel>
                     <TextBlock Text="当前模块" FontSize="12" Foreground="{DynamicResource ColorBrush3}" />
                     <TextBlock x:Name="LabLeftModule" TextWrapping="Wrap" Margin="0,4,0,0" />
